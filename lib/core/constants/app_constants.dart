@@ -49,13 +49,6 @@ class AppConstants {
   static const double chartPadding = 16.0;
   static const int maxDataPoints = 100;
   
-  // 页面路由
-  static const String homeRoute = '/';
-  static const String chartsRoute = '/charts';
-  static const String animationsRoute = '/animations';
-  static const String iconsRoute = '/icons';
-  static const String componentsRoute = '/components';
-  
   // 资源路径
   static const String imagesPath = 'assets/images/';
   static const String iconsPath = 'assets/icons/';

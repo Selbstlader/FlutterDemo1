@@ -1,6 +1,9 @@
 // Core barrel file - 统一导出核心模块
 // 使用方式: import 'package:flutter_framework/core/core.dart';
 
+// Config
+export 'config/app_config.dart';
+
 // Constants
 export 'constants/app_constants.dart';
 
@@ -23,5 +26,6 @@ export 'services/theme_service.dart';
 
 // Widgets
 export 'widgets/chart_widget.dart';
+export 'widgets/form_components.dart';
 export 'widgets/loading_overlay.dart';
 export 'widgets/ui_components.dart';

@@ -80,14 +80,14 @@ class User {
 }
 
 /// 应用配置模型
-class AppConfig {
+class AppConfigModel {
   final String key;
   final dynamic value;
   final String type;
   final String? description;
   final DateTime updatedAt;
 
-  const AppConfig({
+  const AppConfigModel({
     required this.key,
     required this.value,
     required this.type,
@@ -95,8 +95,8 @@ class AppConfig {
     required this.updatedAt,
   });
 
-  factory AppConfig.fromJson(Map<String, dynamic> json) {
-    return AppConfig(
+  factory AppConfigModel.fromJson(Map<String, dynamic> json) {
+    return AppConfigModel(
       key: json['key'] as String,
       value: json['value'],
       type: json['type'] as String,
@@ -119,14 +119,14 @@ class AppConfig {
     return value as T;
   }
 
-  AppConfig copyWith({
+  AppConfigModel copyWith({
     String? key,
     dynamic value,
     String? type,
     String? description,
     DateTime? updatedAt,
   }) {
-    return AppConfig(
+    return AppConfigModel(
       key: key ?? this.key,
       value: value ?? this.value,
       type: type ?? this.type,
