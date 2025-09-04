@@ -1,9 +1,15 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-// 使用barrel文件统一导入，类似Vue的@符号效果
+
+import '../config/app_config.dart';
 import '../services/animation_service.dart';
 import '../../features/features.dart';
-import '../../pages/demo/pages.dart';
+import '../../pages/demo/pages.dart' as demo;
+import '../../pages/home.dart' show HomePage;
 
 /// 转场动画类型
 enum TransitionType {
@@ -47,8 +53,47 @@ class AppRouter {
   late final GoRouter _router;
   GoRouter get router => _router;
 
+  // 应用配置实例
+  final AppConfig _appConfig = AppConfig.instance;
+
+  /// 获取当前应用模式
+  static AppMode get currentMode => AppConfig.currentMode;
+
+  /// 模式变化通知器
+  static ValueNotifier<AppMode> get modeNotifier => AppConfig.modeNotifier;
+
+  /// 切换应用模式
+  static void switchMode(AppMode mode) {
+    AppConfig.switchMode(mode);
+    // 重新初始化路由以应用新模式
+    _instance._reinitializeRouter();
+  }
+
+  /// 重新初始化路由器
+  void _reinitializeRouter() {
+    // 保存当前路由状态
+    final currentLocation =
+        _router?.routerDelegate.currentConfiguration.uri.toString() ??
+            AppRoutes.home;
+
+    _router = GoRouter(
+      navigatorKey: _rootNavigatorKey,
+      initialLocation: currentLocation,
+      debugLogDiagnostics: true,
+      routes: _buildRoutes(),
+      errorBuilder: (context, state) => _buildErrorPage(context, state),
+      redirect: _handleRedirect,
+    );
+
+    // 通知监听器路由已重新初始化
+    AppConfig.modeNotifier.notifyListeners();
+  }
+
   /// 初始化路由
   void init() {
+    // 初始化应用配置
+    _appConfig.init();
+
     _router = GoRouter(
       navigatorKey: _rootNavigatorKey,
       initialLocation: AppRoutes.home,
@@ -57,6 +102,11 @@ class AppRouter {
       errorBuilder: (context, state) => _buildErrorPage(context, state),
       redirect: _handleRedirect,
     );
+
+    // 监听模式变化并重新初始化路由
+    AppConfig.modeNotifier.addListener(() {
+      _reinitializeRouter();
+    });
   }
 
   /// 构建路由列表
@@ -67,7 +117,7 @@ class AppRouter {
         path: AppRoutes.home,
         name: 'home',
         pageBuilder: (context, state) => _buildPageWithTransition(
-          const HomePage(),
+          _getPageForMode('home'),
           state,
           TransitionType.fade,
         ),
@@ -78,7 +128,7 @@ class AppRouter {
         path: AppRoutes.demo,
         name: 'demo',
         pageBuilder: (context, state) => _buildPageWithTransition(
-          const DemoPage(),
+          _getPageForMode('demo'),
           state,
           TransitionType.slide,
         ),
@@ -128,7 +178,7 @@ class AppRouter {
             path: 'theme',
             name: 'theme',
             pageBuilder: (context, state) => _buildPageWithTransition(
-              const ThemeDemo(),
+              _getPageForMode('theme'),
               state,
               TransitionType.fade,
             ),
@@ -138,7 +188,7 @@ class AppRouter {
             path: 'network',
             name: 'network',
             pageBuilder: (context, state) => _buildPageWithTransition(
-              const NetworkDemo(),
+              _getPageForMode('network'),
               state,
               TransitionType.slide,
             ),
@@ -148,7 +198,7 @@ class AppRouter {
             path: 'state',
             name: 'state',
             pageBuilder: (context, state) => _buildPageWithTransition(
-              const StateDemo(),
+              _getPageForMode('state'),
               state,
               TransitionType.slide,
             ),
@@ -161,7 +211,7 @@ class AppRouter {
         path: AppRoutes.settings,
         name: 'settings',
         pageBuilder: (context, state) => _buildPageWithTransition(
-          const SettingsPage(),
+          _getPageForMode('settings'),
           state,
           TransitionType.slide,
         ),
@@ -172,7 +222,7 @@ class AppRouter {
         path: AppRoutes.about,
         name: 'about',
         pageBuilder: (context, state) => _buildPageWithTransition(
-          const AboutPage(),
+          _getPageForMode('about'),
           state,
           TransitionType.fade,
         ),
@@ -183,12 +233,50 @@ class AppRouter {
         path: AppRoutes.profile,
         name: 'profile',
         pageBuilder: (context, state) => _buildPageWithTransition(
-          const ProfilePage(),
+          _getPageForMode('profile'),
           state,
           TransitionType.slide,
         ),
       ),
     ];
+  }
+
+  /// 根据当前模式获取对应的页面组件
+  Widget _getPageForMode(String pageName) {
+    switch (AppConfig.currentMode) {
+      case AppMode.demo:
+        // 演示模式：使用 demo 目录下的页面
+        switch (pageName) {
+          case 'home':
+            return const demo.HomePage();
+          case 'demo':
+            return const demo.DemoPage();
+          case 'settings':
+            return const demo.SettingsPage();
+          case 'about':
+            return const demo.AboutPage();
+          case 'profile':
+            return const demo.ProfilePage();
+          case 'theme':
+            return const demo.ThemeDemo();
+          case 'network':
+            return const demo.NetworkDemo();
+          case 'state':
+            return const demo.StateDemo();
+          default:
+            return const demo.DemoPage();
+        }
+      case AppMode.development:
+        // 开发模式：使用根目录下的页面
+        switch (pageName) {
+          case 'home':
+            return const HomePage();
+          default:
+            return const HomePage();
+        }
+    }
+    // 默认返回值（不应该到达这里）
+    return const HomePage();
   }
 
   /// 构建带转场动画的页面
