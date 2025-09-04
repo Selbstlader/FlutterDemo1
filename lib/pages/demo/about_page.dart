@@ -424,11 +424,20 @@ class _AboutPageState extends State<AboutPage> with TickerProviderStateMixin {
         'icon': Icons.widgets
       },
       {
+        'title': 'UI 组件库',
+        'description': 'Material Design 3.0 风格组件',
+        'icon': Icons.widgets
+      },
+      {
         'title': '网络请求',
         'description': 'Dio 驱动的 HTTP 客户端封装',
         'icon': Icons.cloud
       },
-      {'title': '主题系统', 'description': '支持深色模式和自定义主题配色', 'icon': Icons.palette},
+      {
+        'title': '表单和表格',
+        'description': '移动端友好的表单组件和数据展示组件',
+        'icon': Icons.table_chart
+      },
       {
         'title': '图标管理',
         'description': 'Material Icons 和 SVG 图标支持',

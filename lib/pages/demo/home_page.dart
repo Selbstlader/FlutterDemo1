@@ -245,6 +245,13 @@ class _HomePageState extends State<HomePage>
         route: AppRoutes.components,
       ),
       FeatureItem(
+        title: '表单和表格',
+        subtitle: '移动端友好的表单组件和数据展示组件',
+        icon: Icons.table_chart,
+        color: Colors.teal,
+        route: AppRoutes.forms,
+      ),
+      FeatureItem(
         title: '主题系统',
         subtitle: '深色/浅色主题切换',
         icon: Icons.palette,

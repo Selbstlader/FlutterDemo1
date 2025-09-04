@@ -164,6 +164,14 @@ class _DemoPageState extends State<DemoPage>
         route: AppRoutes.state,
         features: ['Signal状态', 'Computed计算', 'Effect副作用', '状态持久化'],
       ),
+      DemoItem(
+        title: '表单和表格',
+        description: '移动端友好的表单组件和数据展示组件',
+        icon: Icons.table_chart,
+        color: Colors.teal,
+        route: AppRoutes.forms,
+        features: ['表单验证', '数据表格', '搜索筛选', '卡片列表'],
+      ),
     ];
 
     return SliverPadding(

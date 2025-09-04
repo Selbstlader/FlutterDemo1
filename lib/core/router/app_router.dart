@@ -27,6 +27,7 @@ class AppRoutes {
   static const String animations = '/demo/animations';
   static const String icons = '/demo/icons';
   static const String components = '/demo/components';
+  static const String forms = '/demo/forms';
   static const String theme = '/demo/theme';
   static const String network = '/demo/network';
   static const String state = '/demo/state';
@@ -173,6 +174,16 @@ class AppRouter {
               TransitionType.slide,
             ),
           ),
+          // 表单和表格演示
+          GoRoute(
+            path: 'forms',
+            name: 'forms',
+            pageBuilder: (context, state) => _buildPageWithTransition(
+              _getPageForMode('forms'),
+              state,
+              TransitionType.slide,
+            ),
+          ),
           // 主题演示
           GoRoute(
             path: 'theme',
@@ -259,6 +270,8 @@ class AppRouter {
             return const demo.ProfilePage();
           case 'theme':
             return const demo.ThemeDemo();
+          case 'forms':
+            return const demo.FormDemoPage();
           case 'network':
             return const demo.NetworkDemo();
           case 'state':

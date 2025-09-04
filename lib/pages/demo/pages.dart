@@ -10,3 +10,4 @@ export 'profile_page.dart';
 export 'settings_page.dart';
 export 'state_demo.dart';
 export 'theme_demo.dart';
+export 'form_demo_page.dart';
