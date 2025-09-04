@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:go_router/go_router.dart';
-import '../core/widgets/ui_components.dart';
-import '../core/services/theme_service.dart';
-import '../core/services/storage_service.dart';
+import '../../core/widgets/ui_components.dart';
+import '../../core/services/theme_service.dart';
+import '../../core/services/storage_service.dart';
 
-import '../core/services/network_service.dart';
-import '../core/router/app_router.dart';
+import '../../core/services/network_service.dart';
+import '../../core/router/app_router.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});

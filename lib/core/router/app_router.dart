@@ -1,18 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+// 使用barrel文件统一导入，类似Vue的@符号效果
 import '../services/animation_service.dart';
-import '../../pages/home_page.dart';
-import '../../pages/demo_page.dart';
-import '../../features/charts/charts_page.dart';
-import '../../features/animations/animations_page.dart';
-import '../../features/icons/icons_page.dart';
-import '../../features/components/components_page.dart';
-import '../../pages/theme_demo.dart';
-import '../../pages/network_demo.dart';
-import '../../pages/state_demo.dart';
-import '../../pages/settings_page.dart';
-import '../../pages/about_page.dart';
-import '../../pages/profile_page.dart';
+import '../../features/features.dart';
+import '../../pages/demo/pages.dart';
 
 /// 转场动画类型
 enum TransitionType {

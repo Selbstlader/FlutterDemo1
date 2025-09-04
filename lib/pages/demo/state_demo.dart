@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
-import '../core/widgets/ui_components.dart';
-import '../core/services/state_service.dart';
+import '../../core/widgets/ui_components.dart';
+import '../../core/services/state_service.dart';
 
 class StateDemo extends StatefulWidget {
   const StateDemo({super.key});

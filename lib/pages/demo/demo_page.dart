@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../core/widgets/ui_components.dart';
-import '../core/router/app_router.dart';
+import '../../core/widgets/ui_components.dart';
+import '../../core/router/app_router.dart';
 
 class DemoPage extends StatefulWidget {
   const DemoPage({super.key});

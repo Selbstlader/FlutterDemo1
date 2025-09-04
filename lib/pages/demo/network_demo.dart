@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import '../core/services/network_service.dart';
+import '../../core/services/network_service.dart';
 
 /// 网络演示页面
 class NetworkDemo extends StatefulWidget {

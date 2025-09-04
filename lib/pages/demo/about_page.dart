@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:go_router/go_router.dart';
-import '../core/widgets/ui_components.dart';
-import '../core/router/app_router.dart';
+import '../../core/widgets/ui_components.dart';
+import '../../core/router/app_router.dart';
 
 class AboutPage extends StatefulWidget {
   const AboutPage({super.key});
@@ -12,27 +12,24 @@ class AboutPage extends StatefulWidget {
   State<AboutPage> createState() => _AboutPageState();
 }
 
-class _AboutPageState extends State<AboutPage>
-    with TickerProviderStateMixin {
+class _AboutPageState extends State<AboutPage> with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
-  
 
-  
   // 应用信息
   final Signal<String> _appVersion = signal('1.0.0');
   final Signal<String> _buildNumber = signal('1');
   final Signal<String> _buildDate = signal('2024-01-15');
   final Signal<String> _flutterVersion = signal('3.16.0');
   final Signal<String> _dartVersion = signal('3.2.0');
-  
+
   // 统计信息
   final Signal<int> _totalComponents = signal(25);
   final Signal<int> _totalServices = signal(8);
   final Signal<int> _totalPages = signal(12);
   final Signal<int> _codeLines = signal(5420);
-  
+
   @override
   void initState() {
     super.initState();
@@ -51,7 +48,7 @@ class _AboutPageState extends State<AboutPage>
       duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
-    
+
     _fadeAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
@@ -59,7 +56,7 @@ class _AboutPageState extends State<AboutPage>
       parent: _animationController,
       curve: const Interval(0.0, 0.6, curve: Curves.easeOut),
     ));
-    
+
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
@@ -67,7 +64,7 @@ class _AboutPageState extends State<AboutPage>
       parent: _animationController,
       curve: const Interval(0.2, 0.8, curve: Curves.easeOut),
     ));
-    
+
     _animationController.forward();
   }
 
@@ -157,7 +154,8 @@ class _AboutPageState extends State<AboutPage>
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                    color:
+                        Theme.of(context).colorScheme.primary.withOpacity(0.3),
                     blurRadius: 20,
                     spreadRadius: 2,
                     offset: const Offset(0, 8),
@@ -245,7 +243,8 @@ class _AboutPageState extends State<AboutPage>
                 _buildInfoRow('构建版本', _buildNumber.value, Icons.build),
                 _buildInfoRow('构建日期', _buildDate.value, Icons.calendar_today),
                 _buildInfoRow('应用大小', '15.2 MB', Icons.storage),
-                _buildInfoRow('最低系统', 'Android 5.0 / iOS 11.0', Icons.phone_android),
+                _buildInfoRow(
+                    '最低系统', 'Android 5.0 / iOS 11.0', Icons.phone_android),
               ],
             );
           }),
@@ -278,7 +277,8 @@ class _AboutPageState extends State<AboutPage>
           Watch((context) {
             return Column(
               children: [
-                _buildInfoRow('Flutter 版本', _flutterVersion.value, Icons.flutter_dash),
+                _buildInfoRow(
+                    'Flutter 版本', _flutterVersion.value, Icons.flutter_dash),
                 _buildInfoRow('Dart 版本', _dartVersion.value, Icons.code),
                 _buildInfoRow('编译模式', 'Release', Icons.speed),
                 _buildInfoRow('架构支持', 'ARM64, x86_64', Icons.memory),
@@ -364,7 +364,8 @@ class _AboutPageState extends State<AboutPage>
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+      String title, String value, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -402,13 +403,37 @@ class _AboutPageState extends State<AboutPage>
 
   Widget _buildFeatures() {
     final features = [
-      {'title': '响应式状态管理', 'description': 'Signals 驱动的响应式状态管理系统', 'icon': Icons.sync},
-      {'title': '图表可视化', 'description': '基于 fl_chart 的丰富图表组件库', 'icon': Icons.bar_chart},
-      {'title': '动画系统', 'description': '流畅的页面转场和组件动画效果', 'icon': Icons.animation},
-      {'title': 'UI 组件库', 'description': 'Material Design 3.0 风格组件', 'icon': Icons.widgets},
-      {'title': '网络请求', 'description': 'Dio 驱动的 HTTP 客户端封装', 'icon': Icons.cloud},
+      {
+        'title': '响应式状态管理',
+        'description': 'Signals 驱动的响应式状态管理系统',
+        'icon': Icons.sync
+      },
+      {
+        'title': '图表可视化',
+        'description': '基于 fl_chart 的丰富图表组件库',
+        'icon': Icons.bar_chart
+      },
+      {
+        'title': '动画系统',
+        'description': '流畅的页面转场和组件动画效果',
+        'icon': Icons.animation
+      },
+      {
+        'title': 'UI 组件库',
+        'description': 'Material Design 3.0 风格组件',
+        'icon': Icons.widgets
+      },
+      {
+        'title': '网络请求',
+        'description': 'Dio 驱动的 HTTP 客户端封装',
+        'icon': Icons.cloud
+      },
       {'title': '主题系统', 'description': '支持深色模式和自定义主题配色', 'icon': Icons.palette},
-      {'title': '图标管理', 'description': 'Material Icons 和 SVG 图标支持', 'icon': Icons.image},
+      {
+        'title': '图标管理',
+        'description': 'Material Icons 和 SVG 图标支持',
+        'icon': Icons.image
+      },
       {'title': '工具服务', 'description': '日志、存储、路由等基础服务', 'icon': Icons.build},
     ];
 
@@ -531,14 +556,16 @@ class _AboutPageState extends State<AboutPage>
             'GitHub',
             'https://github.com/flutter-framework',
             Icons.code,
-            () => _copyToClipboard('https://github.com/flutter-framework', 'GitHub 地址已复制'),
+            () => _copyToClipboard(
+                'https://github.com/flutter-framework', 'GitHub 地址已复制'),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildContactItem(String title, String value, IconData icon, VoidCallback? onTap) {
+  Widget _buildContactItem(
+      String title, String value, IconData icon, VoidCallback? onTap) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
@@ -727,22 +754,20 @@ class _AboutPageState extends State<AboutPage>
   void _shareApp() {
     const appInfo = 'Flutter 快速开发框架 - 一个功能完整的移动应用开发框架\n'
         '下载地址: https://flutter-framework.com';
-    
+
     Clipboard.setData(const ClipboardData(text: appInfo));
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('应用信息已复制到剪贴板'),
         duration: Duration(seconds: 2),
       ),
     );
-    
-
   }
 
   void _copyToClipboard(String text, String message) {
     Clipboard.setData(ClipboardData(text: text));
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -765,10 +790,10 @@ class _AboutPageState extends State<AboutPage>
         ),
       ),
     );
-    
+
     // 模拟检查更新
     await Future.delayed(const Duration(seconds: 2));
-    
+
     if (mounted) {
       Navigator.of(context).pop();
       showDialog(
@@ -785,8 +810,6 @@ class _AboutPageState extends State<AboutPage>
         ),
       );
     }
-    
-
   }
 
   void _sendFeedback() {

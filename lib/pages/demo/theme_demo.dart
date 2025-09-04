@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
-import '../core/services/theme_service.dart';
-import '../shared/themes/app_theme.dart';
+import '../../core/services/theme_service.dart';
+import '../../shared/themes/app_theme.dart';
 
 /// 主题演示页面
 class ThemeDemo extends StatefulWidget {
