@@ -11,6 +11,7 @@ import '../services/auth_service.dart';
 import '../../features/features.dart';
 import '../../pages/demo/pages.dart' as demo;
 import '../../pages/home.dart' show HomePage;
+import '../../pages/main_page.dart';
 import '../../pages/auth/auth_page.dart';
 
 /// 转场动画类型
@@ -299,9 +300,9 @@ class AppRouter {
         // 开发模式：使用根目录下的页面
         switch (pageName) {
           case 'home':
-            return HomePage();
+            return const MainPage();
           default:
-            return HomePage();
+            return const MainPage();
         }
     }
     // 默认返回值（不应该到达这里）

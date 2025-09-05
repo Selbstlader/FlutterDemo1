@@ -5,6 +5,7 @@ import '../../core/models/auth_models.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/widgets/form_components.dart';
 import '../../core/widgets/ui_components.dart';
+import '../../core/widgets/adaptive_form_field.dart';
 
 /// 登录表单组件
 class LoginForm extends StatefulWidget {
@@ -60,6 +61,7 @@ class _LoginFormState extends State<LoginForm> {
       formKey: _formKey,
       showSubmitButton: false,
       padding: EdgeInsets.zero,
+      keyboardAdaptive: true,
       children: [
         _buildUsernameField(),
         _buildPasswordField(),
@@ -77,45 +79,43 @@ class _LoginFormState extends State<LoginForm> {
 
   /// 构建用户名输入框
   Widget _buildUsernameField() {
-    return AppFormField(
-      label: '登录邮箱',
+    return AdaptiveFormField(
+      labelText: '登录邮箱',
       required: true,
-      child: AppTextField(
-        controller: _usernameController,
-        hint: '请输入登录邮箱',
-        prefixIcon: const Icon(Icons.person_outline),
-        enabled: !_isLoading,
-        textInputAction: TextInputAction.next,
-        validator: AppValidators.required,
-      ),
+      keyboardAdaptive: true,
+      controller: _usernameController,
+      hintText: '请输入登录邮箱',
+      prefixIcon: const Icon(Icons.person_outline),
+      enabled: !_isLoading,
+      textInputAction: TextInputAction.next,
+      validator: AppValidators.required,
     );
   }
 
   /// 构建密码输入框
   Widget _buildPasswordField() {
-    return AppFormField(
-      label: '密码',
+    return AdaptiveFormField(
+      labelText: '密码',
       required: true,
-      child: AppTextField(
-        controller: _passwordController,
-        hint: '请输入密码',
-        prefixIcon: const Icon(Icons.lock_outline),
-        suffixIcon: IconButton(
-          icon: Icon(
-            _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
-          ),
-          onPressed: () {
-            setState(() {
-              _isPasswordVisible = !_isPasswordVisible;
-            });
-          },
+      keyboardAdaptive: true,
+      controller: _passwordController,
+      hintText: '请输入密码',
+      prefixIcon: const Icon(Icons.lock_outline),
+      suffixIcon: IconButton(
+        icon: Icon(
+          _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
         ),
-        obscureText: !_isPasswordVisible,
-        enabled: !_isLoading,
-        textInputAction: TextInputAction.done,
-        onSubmitted: (_) => _handleLogin(),
-        validator: AppValidators.required,
+        onPressed: () {
+          setState(() {
+            _isPasswordVisible = !_isPasswordVisible;
+          });
+        },
       ),
+      obscureText: !_isPasswordVisible,
+      enabled: !_isLoading,
+      textInputAction: TextInputAction.done,
+      onFieldSubmitted: (_) => _handleLogin(),
+      validator: AppValidators.required,
     );
   }
 

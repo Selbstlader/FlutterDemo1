@@ -1,7 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../constants/app_constants.dart';
-import 'loading_manager.dart';
+import 'loading_service.dart';
+import 'error_service.dart';
 
 /// 网络请求服务
 class NetworkService {
@@ -60,20 +61,21 @@ class NetworkService {
   static void _showLoading({String? message, bool? showLoading}) {
     if (_context != null && 
         (showLoading ?? _globalLoadingEnabled)) {
-      LoadingManager.show(_context!, message: message);
+      LoadingService().setGlobalContext(_context!);
+      LoadingService().startGlobalLoading(message);
     }
   }
 
   /// 隐藏 loading
   static void _hideLoading({bool? showLoading}) {
     if (showLoading ?? _globalLoadingEnabled) {
-      LoadingManager.hide();
+      LoadingService().stopGlobalLoading();
     }
   }
 
   /// 释放网络服务
   static void dispose() {
-    LoadingManager.forceHide();
+    LoadingService().clearAllLoading();
     _dio.close();
   }
 
@@ -96,7 +98,12 @@ class NetworkService {
       );
       return response.data as T;
     } on DioException catch (e) {
-      throw _handleError(e);
+      final error = _handleError(e);
+      if (_context != null) {
+        ErrorService().setGlobalContext(_context!);
+        ErrorService().handleNetworkError(error);
+      }
+      throw error;
     } finally {
       _hideLoading(showLoading: showLoading);
     }
@@ -123,7 +130,12 @@ class NetworkService {
       );
       return response.data as T;
     } on DioException catch (e) {
-      throw _handleError(e);
+      final error = _handleError(e);
+      if (_context != null) {
+        ErrorService().setGlobalContext(_context!);
+        ErrorService().handleNetworkError(error);
+      }
+      throw error;
     } finally {
       _hideLoading(showLoading: showLoading);
     }
@@ -150,7 +162,12 @@ class NetworkService {
       );
       return response.data as T;
     } on DioException catch (e) {
-      throw _handleError(e);
+      final error = _handleError(e);
+      if (_context != null) {
+        ErrorService().setGlobalContext(_context!);
+        ErrorService().handleNetworkError(error);
+      }
+      throw error;
     } finally {
       _hideLoading(showLoading: showLoading);
     }
@@ -177,7 +194,12 @@ class NetworkService {
       );
       return response.data as T;
     } on DioException catch (e) {
-      throw _handleError(e);
+      final error = _handleError(e);
+      if (_context != null) {
+        ErrorService().setGlobalContext(_context!);
+        ErrorService().handleNetworkError(error);
+      }
+      throw error;
     } finally {
       _hideLoading(showLoading: showLoading);
     }
@@ -204,7 +226,12 @@ class NetworkService {
       );
       return response.data as T;
     } on DioException catch (e) {
-      throw _handleError(e);
+      final error = _handleError(e);
+      if (_context != null) {
+        ErrorService().setGlobalContext(_context!);
+        ErrorService().handleNetworkError(error);
+      }
+      throw error;
     } finally {
       _hideLoading(showLoading: showLoading);
     }
@@ -228,7 +255,12 @@ class NetworkService {
         cancelToken: cancelToken,
       );
     } on DioException catch (e) {
-      throw _handleError(e);
+      final error = _handleError(e);
+      if (_context != null) {
+        ErrorService().setGlobalContext(_context!);
+        ErrorService().handleNetworkError(error);
+      }
+      throw error;
     } finally {
       _hideLoading(showLoading: showLoading);
     }
@@ -253,7 +285,12 @@ class NetworkService {
       );
       return response.data as T;
     } on DioException catch (e) {
-      throw _handleError(e);
+      final error = _handleError(e);
+      if (_context != null) {
+        ErrorService().setGlobalContext(_context!);
+        ErrorService().handleNetworkError(error);
+      }
+      throw error;
     } finally {
       _hideLoading(showLoading: showLoading);
     }
@@ -292,6 +329,25 @@ class NetworkService {
           type: NetworkExceptionType.unknown,
         );
     }
+  }
+
+  /// 执行带防重复提交的网络请求
+  static Future<T> executeWithDuplicateCheck<T>(
+    String operationId,
+    Future<T> Function() operation, {
+    String? loadingMessage,
+  }) async {
+    final loadingService = LoadingService();
+    if (_context != null) {
+      loadingService.setGlobalContext(_context!);
+    }
+    
+    return await loadingService.executeWithLoading(
+      operation,
+      message: loadingMessage,
+      preventDuplicate: true,
+      operationId: operationId,
+    );
   }
 
   /// 根据状态码获取错误信息

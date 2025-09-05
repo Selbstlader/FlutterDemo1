@@ -11,9 +11,9 @@ import 'core/services/animation_service.dart';
 import 'core/services/icon_service.dart';
 import 'core/services/supabase_service.dart';
 import 'core/services/auth_service.dart';
+import 'core/services/keyboard_service.dart';
 import 'core/router/app_router.dart';
-
-
+import 'core/widgets/adaptive_text_field.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,6 +39,9 @@ Future<void> _initializeServices() async {
     // 初始化认证服务
     await AuthService().initialize();
 
+    // 尝试自动登录
+    await _tryAutoLogin();
+
     // 初始化状态管理服务
     StateService();
 
@@ -56,10 +59,28 @@ Future<void> _initializeServices() async {
     // 初始化图标服务
     await IconService().init();
 
+    // 初始化键盘服务（已在构造函数中自动初始化）
+    KeyboardService();
+
     // 初始化路由
     AppRouter().init();
   } catch (e, stackTrace) {
     rethrow;
+  }
+}
+
+/// 尝试自动登录
+Future<void> _tryAutoLogin() async {
+  try {
+    final authService = AuthService();
+    final result = await authService.tryAutoLogin();
+
+    if (result != null && result.isSuccess) {
+      print('自动登录成功');
+    }
+  } catch (e) {
+    // 自动登录失败不影响应用启动
+    print('自动登录失败: $e');
   }
 }
 
@@ -119,7 +140,7 @@ class MyApp extends StatelessWidget {
         builder: (context, child) {
           // 设置 NetworkService 的 BuildContext
           NetworkService.setContext(context);
-          
+
           return ScreenUtilInit(
             designSize: const Size(375, 812), // 设计稿尺寸
             minTextAdapt: true,
@@ -130,7 +151,15 @@ class MyApp extends StatelessWidget {
                 data: MediaQuery.of(context).copyWith(
                   textScaler: TextScaler.noScaling,
                 ),
-                child: child ?? const SizedBox.shrink(),
+                child: KeyboardMonitor(
+                  onKeyboardShow: () {
+                    // 键盘显示时的处理
+                  },
+                  onKeyboardHide: () {
+                    // 键盘隐藏时的处理
+                  },
+                  child: child ?? const SizedBox.shrink(),
+                ),
               );
             },
             child: child,
@@ -219,6 +248,9 @@ class _AppLifecycleManagerState extends State<AppLifecycleManager>
 
       // 清理图标服务
       IconService().dispose();
+
+      // 清理键盘服务
+      KeyboardService().dispose();
     } catch (e, stackTrace) {
       // 静默处理错误
     }

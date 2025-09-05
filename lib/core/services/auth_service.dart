@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart' as supabase;
 import 'package:signals/signals.dart';
 import '../models/auth_models.dart' as auth_models;
 import 'supabase_service.dart';
+import 'storage_service.dart';
 import '../router/app_router.dart';
 
 /// 认证服务
@@ -57,8 +58,26 @@ class AuthService {
   /// 检查是否已登录
   bool get isLoggedIn => _supabaseService.isLoggedIn;
 
+  /// 自动登录启用状态
+  late final Signal<bool> _autoLoginEnabled;
+  Signal<bool> get autoLoginEnabled => _autoLoginEnabled;
+
+  /// 记住的用户名
+  late final Signal<String?> _rememberedUsername;
+  Signal<String?> get rememberedUsername => _rememberedUsername;
+
+  // 存储键常量
+  static const String _autoLoginKey = 'auto_login_enabled';
+  static const String _rememberedUsernameKey = 'remembered_username';
+  static const String _rememberedPasswordKey = 'remembered_password';
+  static const String _lastLoginTimeKey = 'last_login_time';
+
   /// 初始化认证状态
   void _initializeAuthState() {
+    // 初始化自动登录相关状态
+    _autoLoginEnabled = signal(StorageService.getBool(_autoLoginKey, false) ?? false);
+    _rememberedUsername = signal(StorageService.getString(_rememberedUsernameKey));
+
     // 初始化认证状态
     final user = _supabaseService.currentUser;
     if (user != null) {
@@ -203,6 +222,11 @@ class AuthService {
           profile: userProfile,
         );
 
+        // 如果启用了自动登录，保存凭据
+        if (_autoLoginEnabled.value) {
+          await _saveLoginCredentials(request.username, request.password);
+        }
+
         return auth_models.AuthResult.success(
           user: response.user,
           session: response.session,
@@ -228,9 +252,15 @@ class AuthService {
   }
 
   /// 登出
-  Future<auth_models.AuthResult> signOut() async {
+  /// [clearCredentials] 是否清除保存的登录凭据
+  Future<auth_models.AuthResult> signOut({bool clearCredentials = false}) async {
     try {
       _authState.value = auth_models.AuthState.loading();
+
+      // 如果需要清除凭据
+      if (clearCredentials) {
+        await _clearLoginCredentials();
+      }
 
       // 执行Supabase登出，这会触发认证状态变化事件
       // _handleAuthStateChange会自动处理路由跳转
@@ -342,6 +372,100 @@ class AuthService {
       }
       return false;
     }
+  }
+
+  /// 尝试自动登录
+  Future<auth_models.AuthResult?> tryAutoLogin() async {
+    try {
+      // 检查是否启用自动登录
+      if (!_autoLoginEnabled.value) {
+        return null;
+      }
+
+      // 检查是否有保存的凭据
+      final username = StorageService.getString(_rememberedUsernameKey);
+      final password = StorageService.getString(_rememberedPasswordKey);
+      final lastLoginTime = StorageService.getInt(_lastLoginTimeKey);
+
+      if (username == null || password == null) {
+        return null;
+      }
+
+      // 检查凭据是否过期（30天）
+      if (lastLoginTime != null) {
+        final lastLogin = DateTime.fromMillisecondsSinceEpoch(lastLoginTime);
+        final now = DateTime.now();
+        final daysSinceLastLogin = now.difference(lastLogin).inDays;
+        
+        if (daysSinceLastLogin > 30) {
+          // 凭据过期，清除保存的信息
+          await _clearLoginCredentials();
+          return null;
+        }
+      }
+
+      // 尝试自动登录
+      final loginRequest = auth_models.LoginRequest(
+        username: username,
+        password: password,
+      );
+
+      final result = await loginWithUsername(loginRequest);
+      
+      // 如果自动登录失败，清除保存的凭据
+      if (!result.isSuccess) {
+        await _clearLoginCredentials();
+      }
+
+      return result;
+    } catch (e) {
+      if (kDebugMode) {
+        print('自动登录失败: $e');
+      }
+      // 自动登录失败时清除凭据
+      await _clearLoginCredentials();
+      return null;
+    }
+  }
+
+  /// 设置自动登录
+  Future<void> setAutoLoginEnabled(bool enabled) async {
+    _autoLoginEnabled.value = enabled;
+    await StorageService.setBool(_autoLoginKey, enabled);
+    
+    // 如果禁用自动登录，清除保存的凭据
+    if (!enabled) {
+      await _clearLoginCredentials();
+    }
+  }
+
+  /// 保存登录凭据
+  Future<void> _saveLoginCredentials(String username, String password) async {
+    await Future.wait([
+      StorageService.setString(_rememberedUsernameKey, username),
+      StorageService.setString(_rememberedPasswordKey, password),
+      StorageService.setInt(_lastLoginTimeKey, DateTime.now().millisecondsSinceEpoch),
+    ]);
+    
+    _rememberedUsername.value = username;
+  }
+
+  /// 清除登录凭据
+  Future<void> _clearLoginCredentials() async {
+    await Future.wait([
+      StorageService.remove(_rememberedUsernameKey),
+      StorageService.remove(_rememberedPasswordKey),
+      StorageService.remove(_lastLoginTimeKey),
+    ]);
+    
+    _rememberedUsername.value = null;
+  }
+
+  /// 检查是否有保存的登录凭据
+  bool get hasRememberedCredentials {
+    final username = StorageService.getString(_rememberedUsernameKey);
+    final password = StorageService.getString(_rememberedPasswordKey);
+    return username != null && password != null;
   }
 
   /// 清理资源

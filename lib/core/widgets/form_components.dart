@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'ui_components.dart';
+import 'adaptive_text_field.dart';
+import 'adaptive_form_field.dart';
+import '../services/keyboard_service.dart';
 
 /// 表单容器组件
 class AppForm extends StatefulWidget {
@@ -13,6 +16,8 @@ class AppForm extends StatefulWidget {
   final bool showSubmitButton;
   final bool submitButtonLoading;
   final GlobalKey<FormState>? formKey;
+  final bool keyboardAdaptive;
+  final ScrollController? scrollController;
 
   const AppForm({
     super.key,
@@ -26,6 +31,8 @@ class AppForm extends StatefulWidget {
     this.showSubmitButton = true,
     this.submitButtonLoading = false,
     this.formKey,
+    this.keyboardAdaptive = true,
+    this.scrollController,
   });
 
   @override
@@ -34,11 +41,29 @@ class AppForm extends StatefulWidget {
 
 class _AppFormState extends State<AppForm> {
   late GlobalKey<FormState> _formKey;
+  late ScrollController _scrollController;
+  final _keyboardService = KeyboardService();
 
   @override
   void initState() {
     super.initState();
     _formKey = widget.formKey ?? GlobalKey<FormState>();
+    _scrollController = widget.scrollController ?? ScrollController();
+    
+    if (widget.keyboardAdaptive) {
+      _keyboardService.registerScrollController('form', _scrollController);
+    }
+  }
+
+  @override
+  void dispose() {
+    if (widget.keyboardAdaptive) {
+      _keyboardService.unregisterScrollController('form');
+    }
+    if (widget.scrollController == null) {
+      _scrollController.dispose();
+    }
+    super.dispose();
   }
 
   void _handleSubmit() {
@@ -49,12 +74,13 @@ class _AppFormState extends State<AppForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
+    Widget form = Form(
       key: _formKey,
       autovalidateMode: widget.autovalidateMode 
           ? AutovalidateMode.onUserInteraction 
           : AutovalidateMode.disabled,
       child: SingleChildScrollView(
+        controller: _scrollController,
         child: Padding(
           padding: widget.padding ?? const EdgeInsets.all(16),
           child: Column(
@@ -75,11 +101,22 @@ class _AppFormState extends State<AppForm> {
                     width: double.infinity,
                   ),
                 ],
+              // 添加键盘安全区域
+              if (widget.keyboardAdaptive)
+                Padding(padding: _keyboardService.getKeyboardSafeArea()),
             ],
           ),
         ),
       ),
     );
+
+    if (widget.keyboardAdaptive) {
+      form = KeyboardAwareContainer(
+        child: form,
+      );
+    }
+
+    return form;
   }
 }
 
@@ -90,6 +127,7 @@ class AppFormField extends StatelessWidget {
   final bool required;
   final String? helperText;
   final EdgeInsetsGeometry? padding;
+  final bool keyboardAdaptive;
 
   const AppFormField({
     super.key,
@@ -98,13 +136,14 @@ class AppFormField extends StatelessWidget {
     this.required = false,
     this.helperText,
     this.padding,
+    this.keyboardAdaptive = true,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     
-    return Padding(
+    Widget fieldWidget = Padding(
       padding: padding ?? EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -142,6 +181,8 @@ class AppFormField extends StatelessWidget {
         ],
       ),
     );
+
+    return fieldWidget;
   }
 }
 

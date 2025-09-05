@@ -5,6 +5,7 @@ import '../../core/models/auth_models.dart';
 import '../../core/services/auth_service.dart';
 import '../../core/widgets/form_components.dart';
 import '../../core/widgets/ui_components.dart';
+import '../../core/widgets/adaptive_form_field.dart';
 
 /// 注册表单组件
 class RegisterForm extends StatefulWidget {
@@ -66,6 +67,7 @@ class _RegisterFormState extends State<RegisterForm> {
       formKey: _formKey,
       showSubmitButton: false,
       padding: EdgeInsets.zero,
+      keyboardAdaptive: true,
       children: [
         _buildUsernameField(),
         // _buildDisplayNameField(),
@@ -85,98 +87,94 @@ class _RegisterFormState extends State<RegisterForm> {
 
   /// 构建用户名输入框
   Widget _buildUsernameField() {
-    return AppFormField(
-      label: '邮箱',
+    return AdaptiveFormField(
+      labelText: '邮箱',
       required: true,
-      child: AppTextField(
-        controller: _usernameController,
-        hint: '请输入注册邮箱',
-        prefixIcon: const Icon(Icons.person_outline),
-        enabled: !_isLoading,
-        textInputAction: TextInputAction.next,
-        validator: AppValidators.required,
-      ),
+      keyboardAdaptive: true,
+      controller: _usernameController,
+      hintText: '请输入注册邮箱',
+      prefixIcon: const Icon(Icons.person_outline),
+      enabled: !_isLoading,
+      textInputAction: TextInputAction.next,
+      validator: AppValidators.required,
     );
   }
 
   /// 构建显示名称输入框
   Widget _buildDisplayNameField() {
-    return AppFormField(
-      label: '显示名称',
+    return AdaptiveFormField(
+      labelText: '显示名称',
       required: false,
+      keyboardAdaptive: true,
       helperText: '可选，用于显示的昵称',
-      child: AppTextField(
-        controller: _displayNameController,
-        hint: '请输入显示名称',
-        prefixIcon: const Icon(Icons.badge_outlined),
-        enabled: !_isLoading,
-        textInputAction: TextInputAction.next,
-        validator: null, // Optional field, no validation needed
-      ),
+      controller: _displayNameController,
+      hintText: '请输入显示名称',
+      prefixIcon: const Icon(Icons.badge_outlined),
+      enabled: !_isLoading,
+      textInputAction: TextInputAction.next,
+      validator: null, // Optional field, no validation needed
     );
   }
 
   /// 构建密码输入框
   Widget _buildPasswordField() {
-    return AppFormField(
-      label: '密码',
+    return AdaptiveFormField(
+      labelText: '密码',
       required: true,
-      helperText: '请输入密码',
-      child: AppTextField(
-        controller: _passwordController,
-        hint: '请输入密码',
-        prefixIcon: const Icon(Icons.lock_outline),
-        suffixIcon: IconButton(
-          icon: Icon(
-            _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
-          ),
-          onPressed: () {
-            setState(() {
-              _isPasswordVisible = !_isPasswordVisible;
-            });
-          },
+      keyboardAdaptive: true,
+      // helperText: '请输入密码',
+      controller: _passwordController,
+      hintText: '请输入密码',
+      prefixIcon: const Icon(Icons.lock_outline),
+      suffixIcon: IconButton(
+        icon: Icon(
+          _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
         ),
-        obscureText: !_isPasswordVisible,
-        enabled: !_isLoading,
-        textInputAction: TextInputAction.next,
-        validator: AppValidators.required,
+        onPressed: () {
+          setState(() {
+            _isPasswordVisible = !_isPasswordVisible;
+          });
+        },
       ),
+      obscureText: !_isPasswordVisible,
+      enabled: !_isLoading,
+      textInputAction: TextInputAction.next,
+      validator: AppValidators.required,
     );
   }
 
   /// 构建确认密码输入框
   Widget _buildConfirmPasswordField() {
-    return AppFormField(
-      label: '确认密码',
+    return AdaptiveFormField(
+      labelText: '确认密码',
       required: true,
-      child: AppTextField(
-        controller: _confirmPasswordController,
-        hint: '请再次输入密码',
-        prefixIcon: const Icon(Icons.lock_outline),
-        suffixIcon: IconButton(
-          icon: Icon(
-            _isConfirmPasswordVisible ? Icons.visibility_off : Icons.visibility,
-          ),
-          onPressed: () {
-            setState(() {
-              _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
-            });
-          },
+      keyboardAdaptive: true,
+      controller: _confirmPasswordController,
+      hintText: '请再次输入密码',
+      prefixIcon: const Icon(Icons.lock_outline),
+      suffixIcon: IconButton(
+        icon: Icon(
+          _isConfirmPasswordVisible ? Icons.visibility_off : Icons.visibility,
         ),
-        obscureText: !_isConfirmPasswordVisible,
-        enabled: !_isLoading,
-        textInputAction: TextInputAction.done,
-        onSubmitted: (_) => _handleRegister(),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return '此字段为必填项';
-          }
-          if (value != _passwordController.text) {
-            return '两次输入的密码不一致';
-          }
-          return null;
+        onPressed: () {
+          setState(() {
+            _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+          });
         },
       ),
+      obscureText: !_isConfirmPasswordVisible,
+      enabled: !_isLoading,
+      textInputAction: TextInputAction.done,
+      onFieldSubmitted: (_) => _handleRegister(),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return '此字段为必填项';
+        }
+        if (value != _passwordController.text) {
+          return '两次输入的密码不一致';
+        }
+        return null;
+      },
     );
   }
 

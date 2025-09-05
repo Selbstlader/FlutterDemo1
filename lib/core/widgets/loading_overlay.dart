@@ -66,7 +66,7 @@ class _LoadingOverlayState extends State<LoadingOverlay>
       builder: (context, child) {
         return Material(
           color: (widget.backgroundColor ?? Colors.black54)
-              .withOpacity(_fadeAnimation.value * 0.7),
+              .withOpacity((_fadeAnimation.value * 0.7).clamp(0.0, 1.0)),
           child: Center(
             child: Transform.scale(
               scale: _scaleAnimation.value,
