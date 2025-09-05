@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 /// 设置为 AppMode.development 强制使用开发模式
 ///
 /// 测试手动切换：将下面的值改为 AppMode.demo 或 AppMode.development
-const AppMode? MANUAL_MODE = AppMode.demo;
+const AppMode? MANUAL_MODE = AppMode.development;
 
 /// 应用模式枚举
 enum AppMode {

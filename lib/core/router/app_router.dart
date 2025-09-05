@@ -7,9 +7,11 @@ import 'package:go_router/go_router.dart';
 
 import '../config/app_config.dart';
 import '../services/animation_service.dart';
+import '../services/auth_service.dart';
 import '../../features/features.dart';
 import '../../pages/demo/pages.dart' as demo;
 import '../../pages/home.dart' show HomePage;
+import '../../pages/auth/auth_page.dart';
 
 /// 转场动画类型
 enum TransitionType {
@@ -34,6 +36,9 @@ class AppRoutes {
   static const String settings = '/settings';
   static const String about = '/about';
   static const String profile = '/profile';
+  static const String auth = '/auth';
+  static const String login = '/auth/login';
+  static const String register = '/auth/register';
   static const String notFound = '/404';
 }
 
@@ -249,6 +254,17 @@ class AppRouter {
           TransitionType.slide,
         ),
       ),
+
+      // 认证页面
+      GoRoute(
+        path: AppRoutes.auth,
+        name: 'auth',
+        pageBuilder: (context, state) => _buildPageWithTransition(
+          const AuthPage(),
+          state,
+          TransitionType.slide,
+        ),
+      ),
     ];
   }
 
@@ -283,13 +299,13 @@ class AppRouter {
         // 开发模式：使用根目录下的页面
         switch (pageName) {
           case 'home':
-            return const HomePage();
+            return HomePage();
           default:
-            return const HomePage();
+            return HomePage();
         }
     }
     // 默认返回值（不应该到达这里）
-    return const HomePage();
+    return HomePage();
   }
 
   /// 构建带转场动画的页面
@@ -360,9 +376,43 @@ class AppRouter {
   }
 
   /// 处理重定向
+  /// 在开发模式下检查用户认证状态，未认证用户重定向到登录页面
   String? _handleRedirect(BuildContext context, GoRouterState state) {
-    // 这里可以添加认证检查、权限验证等逻辑
-    return null; // 不重定向
+    // 获取当前路由路径
+    final String location = state.uri.toString();
+
+    // 检查是否为开发模式
+    if (AppConfig.currentMode == AppMode.development) {
+      // 获取认证服务实例
+      final AuthService authService = AuthService();
+
+      // 检查用户是否已登录
+      final bool isLoggedIn = authService.isLoggedIn;
+
+      // 定义不需要认证的路由（认证相关页面）
+      final List<String> publicRoutes = [
+        AppRoutes.auth,
+        AppRoutes.login,
+        AppRoutes.register,
+      ];
+
+      // 检查当前路由是否为公开路由
+      final bool isPublicRoute =
+          publicRoutes.any((route) => location.startsWith(route));
+
+      // 如果用户未登录且不是访问公开路由，重定向到认证页面
+      if (!isLoggedIn && !isPublicRoute) {
+        return AppRoutes.auth;
+      }
+
+      // 如果用户已登录且正在访问认证页面，重定向到首页
+      if (isLoggedIn && isPublicRoute) {
+        return AppRoutes.home;
+      }
+    }
+
+    // 其他情况不重定向
+    return null;
   }
 
   /// 构建错误页面

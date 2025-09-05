@@ -9,6 +9,8 @@ import 'core/services/theme_service.dart';
 import 'core/services/network_service.dart';
 import 'core/services/animation_service.dart';
 import 'core/services/icon_service.dart';
+import 'core/services/supabase_service.dart';
+import 'core/services/auth_service.dart';
 import 'core/router/app_router.dart';
 
 
@@ -30,6 +32,12 @@ Future<void> _initializeServices() async {
   try {
     // 初始化存储服务
     await StorageService.init();
+
+    // 初始化Supabase服务
+    await SupabaseService.initialize();
+
+    // 初始化认证服务
+    await AuthService().initialize();
 
     // 初始化状态管理服务
     StateService();

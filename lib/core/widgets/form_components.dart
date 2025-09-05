@@ -54,27 +54,29 @@ class _AppFormState extends State<AppForm> {
       autovalidateMode: widget.autovalidateMode 
           ? AutovalidateMode.onUserInteraction 
           : AutovalidateMode.disabled,
-      child: Padding(
-        padding: widget.padding ?? const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: widget.crossAxisAlignment,
-          mainAxisAlignment: widget.mainAxisAlignment,
-          children: [
-            ...widget.children.map((child) => Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: child,
-            )),
-            if (widget.showSubmitButton) ...
-              [
-                const SizedBox(height: 8),
-                AppButton(
-                  text: widget.submitButtonText!,
-                  onPressed: widget.submitButtonLoading ? null : _handleSubmit,
-                  loading: widget.submitButtonLoading,
-                  width: double.infinity,
-                ),
-              ],
-          ],
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: widget.padding ?? const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: widget.crossAxisAlignment,
+            mainAxisAlignment: widget.mainAxisAlignment,
+            children: [
+              ...widget.children.map((child) => Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: child,
+              )),
+              if (widget.showSubmitButton) ...
+                [
+                  const SizedBox(height: 8),
+                  AppButton(
+                    text: widget.submitButtonText!,
+                    onPressed: widget.submitButtonLoading ? null : _handleSubmit,
+                    loading: widget.submitButtonLoading,
+                    width: double.infinity,
+                  ),
+                ],
+            ],
+          ),
         ),
       ),
     );
@@ -512,47 +514,37 @@ class AppValidators {
     return null;
   }
 
-  /// 邮箱验证
+  /// 邮箱验证 - 简化为基本存在性检查
   static String? email(String? value, [String? message]) {
-    if (value == null || value.isEmpty) return null;
-    
-    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-    if (!emailRegex.hasMatch(value)) {
-      return message ?? '请输入有效的邮箱地址';
+    if (value == null || value.isEmpty) {
+      return message ?? '邮箱不能为空';
     }
     return null;
   }
 
-  /// 手机号验证
+  /// 手机号验证 - 简化为基本存在性检查
   static String? phone(String? value, [String? message]) {
-    if (value == null || value.isEmpty) return null;
-    
-    final phoneRegex = RegExp(r'^1[3-9]\d{9}$');
-    if (!phoneRegex.hasMatch(value)) {
-      return message ?? '请输入有效的手机号码';
+    if (value == null || value.isEmpty) {
+      return message ?? '手机号不能为空';
     }
     return null;
   }
 
-  /// 最小长度验证
+  /// 最小长度验证 - 简化为基本存在性检查
   static String? Function(String?) minLength(int minLength, [String? message]) {
     return (String? value) {
-      if (value == null || value.isEmpty) return null;
-      
-      if (value.length < minLength) {
-        return message ?? '至少需要$minLength个字符';
+      if (value == null || value.isEmpty) {
+        return message ?? '此字段为必填项';
       }
       return null;
     };
   }
 
-  /// 最大长度验证
+  /// 最大长度验证 - 简化为基本存在性检查
   static String? Function(String?) maxLength(int maxLength, [String? message]) {
     return (String? value) {
-      if (value == null || value.isEmpty) return null;
-      
-      if (value.length > maxLength) {
-        return message ?? '最多只能输入$maxLength个字符';
+      if (value == null || value.isEmpty) {
+        return message ?? '此字段为必填项';
       }
       return null;
     };

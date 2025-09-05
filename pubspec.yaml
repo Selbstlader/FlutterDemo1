@@ -56,6 +56,10 @@ dependencies:
   # 本地存储 - 键值存储
   shared_preferences: ^2.2.0
   
+  # Supabase - 后端服务
+  supabase_flutter: ^2.0.0
+  flutter_secure_storage: ^9.0.0
+  
   # 工具库
   logger: ^2.0.0
   flutter_screenutil: ^5.9.0
